@@ -1,34 +1,17 @@
 import streamlit as st
-import sys
-import subprocess
-
-# --- 🛠️ AUTO-REPAIR SYSTEM ---
-# This block forces the server to install the CORRECT version of the library
-# if it detects the "Zombie" version is running.
-try:
-    from youtube_transcript_api import YouTubeTranscriptApi
-    # If the tool is missing the 'get_transcript' button, it's broken.
-    if not hasattr(YouTubeTranscriptApi, 'get_transcript'):
-        raise ImportError("Broken library detected!")
-except (ImportError, AttributeError):
-    st.toast("🔧 Fixing broken library... please wait...")
-    # This command force-reinstalls the correct tool
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "--force-reinstall", "youtube-transcript-api"])
-    from youtube_transcript_api import YouTubeTranscriptApi
-
+from youtube_transcript_api import YouTubeTranscriptApi
 import google.generativeai as genai
-# -----------------------------
 
 st.set_page_config(page_title="Gemini YouTube Summarizer", page_icon="♊")
 
 st.title("♊ Gemini YouTube Summarizer")
 st.write("Paste a YouTube link below to get a concise summary.")
 
-# Get the API Key from the Secrets Safe
+# Securely get the API key
 try:
     api_key = st.secrets["GOOGLE_API_KEY"]
 except KeyError:
-    st.error("🚨 API Key is missing! Go to 'Settings > Secrets' and add GOOGLE_API_KEY.")
+    st.error("🚨 API Key is missing! Please set GOOGLE_API_KEY in Streamlit Secrets.")
     st.stop()
 
 def get_transcript(youtube_url):
@@ -40,7 +23,6 @@ def get_transcript(youtube_url):
         else:
             return "Error: Invalid YouTube URL"
             
-        # This should now work 100% because of the Auto-Repair above
         transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
         transcript_text = " ".join([item['text'] for item in transcript_list])
         return transcript_text
@@ -70,5 +52,3 @@ if st.button("Get Summary"):
                 summary = summarize_with_gemini(transcript, api_key)
                 st.subheader("Summary:")
                 st.markdown(summary)
-    else:
-        st.warning("Please enter a YouTube link first.")
