@@ -1,4 +1,1 @@
-streamlit
-youtube-transcript-api==0.6.3
-google-generativeai
-requests
+pip install streamlit yt-dlp faster-whisper
