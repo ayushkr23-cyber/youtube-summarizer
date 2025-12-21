@@ -1,3 +1,4 @@
-streamlit yt-dlp faster-whisper
-
+streamlit 
+yt-dlp 
+faster-whisper
 
